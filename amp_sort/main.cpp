@@ -4,19 +4,20 @@
 #include <conio.h>
 #include "radix_sort.h"
 #include <ppl.h>
+#include <iostream>
 
 
 int main()
 {
 	using namespace concurrency;
 	accelerator default_device;
-    wprintf(L"Using device : %s\n\n", default_device.get_description());
+    std::wcout << default_device.get_description() << std::endl << std::endl;
     if (default_device == accelerator(accelerator::direct3d_ref))
         printf("WARNING!! Running on very slow emulator! Only use this accelerator for debugging.\n\n");
 
-	for(uint i = 0; i < 10; i ++)
+	for(uint i = 0; i < 12; i ++)
 	{
-		uint num = (1<<(i+13));
+		uint num = (1<<(i+12));
 		printf("Testing for %u elements: \n", num);
 
 		std::vector<uint> data(num);
@@ -49,15 +50,6 @@ int main()
 			std::chrono::duration_cast<std::chrono::microseconds> (end_fill-start_fill+end_collect-start_collect).count(),
 			std::chrono::duration_cast<std::chrono::microseconds> (end_comp-start_comp).count());
 
-		printf("Testing for correctness. Results are.. ");
-
-		uint success = 1;
-		for(uint i = 0; i < num; i ++)
-		{
-			if(data[i] != i) { success = 0; break;}
-		}
-		printf("%s\n", (success? "correct!" : "incorrect!"));
-
 		data = dataclone;
 		printf("Beginning CPU sorts for comparison.\n");
 		start_comp = std::chrono::high_resolution_clock::now();
@@ -73,7 +65,6 @@ int main()
 		printf("CPU concurrency::parallel_sort completed in %llu microseconds. \n\n\n", std::chrono::duration_cast<std::chrono::microseconds>(end_comp-start_comp).count());
 
 	}
-
 
 	printf("Press any key to exit! \n");
 	_getch();
